@@ -38,6 +38,7 @@
 
 2) Instalação do **MySQL Community Edition**:   
       2.1) **MySQL Server v.8.0.22** disponível em https://dev.mysql.com/downloads/mysql/
+ 
       2.2) **MySQL Workbench v8.0.22** disponível em https://dev.mysql.com/downloads/workbench/
 
 3) **Base de dados Sakila** disponível em https://dev.mysql.com/doc/sakila/en/sakila-installation.html
