@@ -1,0 +1,80 @@
+Além da sintaxe INNER JOIN, estudamos diversas outras opções de relacionamentos entre tabelas SQL, 
+que a partir de agora te permitem explorar as mais diversas bases de dados. 
+Não haverá um dia no seu trabalho com SQL em que você não irá fazer um relacionamento!
+Antes de caminharmos para o próximo módulo, estude o conteúdo e responda às perguntas:
+
+
+1. A gestão da locadora decidiu que no mês de julho de 2005 haverá um prêmio para o funcionário que mais registrou vendas, e pediu sua ajuda para determinar a premiação.
+
+a. Usando a tabela staff como driving table, escreva uma consulta SQL que traga todas as vendas realizadas por cada funcionário no mês de julho de 2005. 
+Não é permitido utilizar o filtro WHERE!
+
+SELECT DISTINCT s.first_name,
+		s.last_name,
+		COUNT(p.rental_id) AS total_registros
+FROM sakila.staff AS s
+INNER JOIN sakila.payment AS p
+ON s.staff_id = p.staff_id
+	AND p.payment_date BETWEEN "2005-07-01" AND "2005-07-31"
+GROUP BY s.staff_id
+ORDER BY total_registros DESC;
+
+
+
+b. Qual cláusula de relacionamento você utilizou no item a), e por quê? Quais seriam as consequências de utilizar outro tipo de relacionamento?
+
+INNER JOIN porque traz somente os registros com a chave em comum.
+O OUTER JOIN traria a união de tudo ou a diferença entre as tabelas.
+
+
+
+
+c. Altere essa consulta para trazer o total em pagamentos processados por cada funcionário.
+
+SELECT DISTINCT s.first_name,
+		s.last_name,
+		SUM(p.amount) AS total_vendas
+FROM sakila.staff AS s
+INNER JOIN sakila.payment AS p
+ON s.staff_id = p.staff_id
+	AND p.payment_date BETWEEN "2005-07-01" AND "2005-07-31"
+GROUP BY s.staff_id
+ORDER BY total_vendas DESC;
+
+
+
+d. Por fim, responda: qual funcionário deve ganhar o prêmio? Qual foi o valor total de vendas no mês?
+
+O funcionário que mais registrou vendas foi o MIKE.
+O valor total de vendas da empresa no mês foi de 25505.68
+
+
+
+2. Na tarefa do módulo anterior, você descobriu que alguns aluguéis ainda não foram devolvidos. 
+Precisamos buscar esses itens! Escreva uma consulta que retorne a lista de emails das pessoas que estão com aluguéis pendentes, e o número de itens a serem retornados.
+
+SELECT DISTINCT c.email,
+		COUNT(r.rental_id) AS total_itens_retornar
+FROM sakila.rental AS r
+INNER JOIN sakila.inventory AS i ON r.inventory_id = i.inventory_id
+INNER JOIN sakila.film AS f ON f.film_id = i.film_id
+INNER JOIN sakila.customer AS c ON r.customer_id = c.customer_id
+WHERE r.return_date IS NULL
+GROUP BY c.email
+ORDER BY total_itens_retornar DESC;
+
+
+
+Bônus opcional: utilize a função GROUP_CONCAT, que estudamos no módulo 5, para retornar também uma lista com o nome dos filmes que devem ser devolvidos.
+SELECT GROUP_CONCAT(f.title) AS titulos_filmes,
+	c.email,
+	COUNT(r.rental_id) AS total_itens_retornar
+FROM sakila.rental AS r
+INNER JOIN sakila.inventory AS i ON r.inventory_id = i.inventory_id
+INNER JOIN sakila.film AS f ON f.film_id = i.film_id
+INNER JOIN sakila.customer AS c ON r.customer_id = c.customer_id
+WHERE r.return_date IS NULL
+GROUP BY c.email
+ORDER BY total_itens_retornar DESC;
+
+

@@ -1,0 +1,76 @@
+As funções de janela são uma aplicação avançada do uso do SQL para manipulação de dados. 
+É uma grande ferramenta para possuir, que pode te ajudar a chegar mais rápido em análises estatísticas avançadas! 
+Para solidificar seus conhecimentos, responda às perguntas abaixo. 
+Submeta suas respostas em um arquivo com extensão .sql, e use comentários (com os caracteres -- ou /* */) para escrever suas respostas por extenso e delimitar as questões. 
+Dica: utilize subconsultas para facilitar seu trabalho!
+
+
+
+/* 
+1. Escreva uma consulta SQL que, com base no total em pagamentos realizados (coluna amount da tabela payment), divida todos os consumidores da locadora em 4 grupos. 
+Além disso, com ajuda da função CASE WHEN, classifique consumidores nesses grupos, do de maiores pagadores ao de menores, respectivamente em:
+o "Especial"
+o "Fiel"
+o "Ocasional"
+o "Iniciante"
+
+Sua consulta final deve conter as colunas: email, classificacao, total_pago 
+*/
+
+SELECT  c.email,
+	CASE WHEN NTILE(4) OVER (ORDER BY SUM(p.amount) DESC) = 1 THEN 'Especial'
+	     WHEN NTILE(4) OVER (ORDER BY SUM(p.amount) DESC) = 2 THEN 'Fiel'
+             WHEN NTILE(4) OVER (ORDER BY SUM(p.amount) DESC) = 3 THEN 'Ocasional'
+	   ELSE 'Iniciante' END AS classificacao,
+	SUM(p.amount) AS total_pago
+FROM customer AS c
+INNER JOIN payment AS p
+ON c.customer_id = p.customer_id
+GROUP BY c.email
+ORDER BY total_pago DESC;
+
+
+
+
+
+
+/*
+2. Escreva uma consulta SQL que responda: qual foi a primeira loja da rede a atingir um total de $10.000 no mês de julho/2005?
+*/
+
+WITH sales AS (
+	SELECT  DATE_FORMAT(p.payment_date, '%Y-%m-%d') data,
+		c.store_id,
+		SUM(p.amount) AS total_vendas
+	FROM customer AS C
+	INNER JOIN payment AS p 
+    ON c.customer_id = p.customer_id
+	WHERE p.payment_date BETWEEN '2005-07-01' AND '2005-07-31'
+	GROUP BY data, c.store_id
+	ORDER BY store_id, data),
+    
+cumulative_sum AS (
+	SELECT  *,
+		SUM(total_vendas) OVER(PARTITION BY store_id ORDER BY data) acumulado_vendas
+	FROM sales)
+
+SELECT  data,
+	store_id,
+	acumulado_vendas
+FROM cumulative_sum
+WHERE acumulado_vendas >= 10000
+ORDER BY data ASC
+LIMIT 1;
+
+
+
+
+
+
+
+
+
+
+
+
+

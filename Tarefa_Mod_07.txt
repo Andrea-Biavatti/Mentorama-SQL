@@ -1,0 +1,56 @@
+O conceito de relacionamentos entre tabelas por meio da sintaxe INNER JOIN abre novas portas na sua jornada com SQL. 
+Estude o conteúdo, e utilizando a base de dados sakila responda às perguntas:
+
+
+1. Escreva uma consulta SQL que:
+	a. Parta da tabela film (dica: essa será a tabela ao lado do comando FROM)
+	b. Relacione todas as tabelas com prefixo film_
+	c. Não tenha colunas redundantes no resultado final (ou seja, as colunas em comum devem ser removidas da consulta)
+
+SELECT f.*,
+	fa.actor_id,
+        fc.category_id
+FROM sakila.film AS f
+INNER JOIN sakila.film_actor AS fa ON f.film_id = fa.film_id
+INNER JOIN sakila.film_category AS fc ON f.film_id = fc.film_id;
+
+
+
+2. Esse mês, iremos oferecer um prêmio para todos os consumidores que já alugaram mais de 40 filmes! 
+Para auxiliar na estratégia, a equipe responsável precisa da sua ajuda para identificar quem são essas pessoas, 
+e gerar uma base com seus dados de contato (nome, sobrenome, email e cidade da loja de cadastro).
+Dicas: sua consulta final deverá retornar as 4 colunas listadas acima, e você precisará fazer a união entre diversas tabelas para isso. 
+Caso necessário, revise o módulo 5 - Funções de Agregação.
+
+SELECT c.first_name AS Nome,
+	c.last_name AS Sobrenome,
+        c.email,
+		CASE 
+			WHEN c.store_id = 1 THEN "Lethbridge"
+       			WHEN c.store_id = 2 THEN "Woodridge"
+		END AS Cidade_loja_cadastro
+FROM sakila.payment AS p
+INNER JOIN sakila.customer AS C ON p.customer_id = c.customer_id
+GROUP BY p.customer_id
+HAVING COUNT(p.customer_id) > 40
+ORDER BY Nome ASC, Sobrenome ASC;
+
+
+
+3. Crie uma consulta que relaciona a tabela inventory com outras tabelas. Com base no seu código e nos resultados, o que você imagina que essa tabela representa?
+Inventário de todos os filmes existentes nas lojas.
+SELECT f.* , s.*
+FROM sakila.film AS f
+INNER JOIN sakila.inventory AS i ON i.film_id = f.film_id
+INNER JOIN sakila.store AS s ON s.store_id = i.store_id;
+
+
+
+4. Com base na tabela rental, podemos ver que alguns aluguéis não foram devolvidos (registros em que a coluna return_date é nula). Qual é o valor total pago por esses aluguéis?
+SELECT SUM(f.rental_rate) AS total_alugueis 
+FROM sakila.rental AS r
+INNER JOIN sakila.inventory AS i ON r.inventory_id = i.inventory_id
+INNER JOIN sakila.film AS f ON f.film_id = i.film_id
+WHERE return_date IS NULL;
+
+

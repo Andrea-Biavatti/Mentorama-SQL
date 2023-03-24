@@ -1,0 +1,53 @@
+Os conceitos de ordenação e agrupamento serão muito importantes na sua jornada com SQL. Os exercícios abaixo irão ajudar a consolidar seu aprendizado:
+
+1. Analise a tabela rental e responda:
+	a. Qual é a ordenação padrão da tabela? Qual comando você utilizou para analisar? 
+		É ordenada pelo rental_id, na ordem que foi inserido no sistema.
+		SELECT * FROM sakila.rental;
+
+	b. Qual consulta SQL você pode usar para ordenar os registros de forma descendente por data de retorno do DVD?
+		SELECT * FROM sakila.rental ORDER BY return_date DESC;
+
+	c. Qual consulta SQL você pode usar para ordenar os registros de forma combinada: ascendente por id do consumidor, e ascendente por data de retorno do DVD?
+		SELECT * FROM sakila.rental ORDER BY customer_id, return_date;
+
+	d. O que acontece com os valores NULL na ordenação?
+		São considerados os primeiros na ordenação.
+
+
+2. Quais são as combinações únicas de features especiais (coluna special_features) dos filmes? Qual consulta você utilizou para chegar a esse resultado?
+Dica 1: utilize a cláusula ORDER BY para facilitar a visualização
+Dica 2: caso não tenha conhecimento do inglês, utilize um tradutor ou dicionário para conhecer mais sobre os dados
+	As combinações únicas de features especiais são:
+	1 - Trailers
+	2 - Commentaries
+	3 - Trailers,Commentaries
+	4 - Deleted Scenes
+	5 - Trailers,Deleted Scenes
+	6 - Commentaries,Deleted Scenes
+	7 - Trailers,Commentaries,Deleted Scenes
+	8 - Behind the Scenes
+	9 - Trailers,Behind the Scenes
+	10 - Commentaries,Behind the Scenes
+	11 - Trailers,Commentaries,Behind the Scenes
+	12 - Deleted Scenes,Behind the Scenes
+	13 - Trailers,Deleted Scenes,Behind the Scenes
+	14 - Commentaries,Deleted Scenes,Behind the Scenes
+	15 - Trailers,Commentaries,Deleted Scenes,Behind the Scenes
+
+	SELECT DISTINCT special_features FROM sakila.film ORDER BY 1;
+
+
+3. Você está ajudando a equipe de desenvolvimento a criar uma nova funcionalidade no sistema da locadora, permitindo que a equipe de atendentes liste os consumidores de maneira similar 
+a seus celulares, ordenando por sobrenome ascendente e nome descendente (exemplo abaixo). 
+Qual consulta SQL você pode usar para esse objetivo?
+
+	sobrenome	nome
+	ABNEY		RAFAEL
+	ADAM		NATHANIEL
+	ADAMS		KATHLEEN
+	ALEXANDER	DIANA
+
+	SELECT last_name AS Sobrenome, first_name AS Nome
+	FROM sakila.customer
+	ORDER BY 1 ASC, 2 DESC;

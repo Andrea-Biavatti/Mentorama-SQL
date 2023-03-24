@@ -1,0 +1,69 @@
+A sintaxe CASE WHEN é uma das mais utilizadas em SQL no dia-a-dia, seja de análise de dados ou gerenciamento de bancos de dados. 
+Para fixar seu aprendizado, utilize a base de dados sakila e responda:
+
+
+
+1. A equipe comercial da locadora está criando uma nova estratégia e pediu que você classificasse os filmes do catálogo de acordo com seu preço de aluguel. 
+A regra para a classificação é:
+o Aluguel menor ou igual a 0.99: Básico
+o Aluguel entre 0.99 e 2.99: Essencial
+o Aluguel maior que 2.99: Exclusivo
+
+Escreva uma consulta SQL que, a partir da tabela film, retorne a lista classificada, contendo as colunas: 
+id, nome do filme, preço de aluguel e classificação.
+SELECT film_id AS id,
+		title AS nome_dofilme,
+        rental_rate AS preco_de_aluguel,
+		CASE
+			WHEN rental_rate <= 0.99
+				THEN "Básico"
+			WHEN rental_rate BETWEEN 0.99 AND 2.99
+				THEN "Essencial"
+			WHEN rental_rate > 2.99
+				THEN "Exclusivo"
+		END AS classificacao
+FROM sakila.film;
+
+
+
+2. A tabela customer contém: 
+dados das pessoas cadastradas na rede de locadoras, 
+identificação da loja que a pessoa se cadastrou (a partir da coluna store_id) e também 
+se o cadastro está ativo ou não (coluna active). 
+
+Escreva uma consulta SQL que utilize o comando CASE WHEN e retorne a contagem de consumidores ativos e inativos para cada uma das lojas. 
+Dica: existem 4 possibilidades de resultados (lojas 1 e 2, e pessoa ativa ou inativa)
+SELECT  SUM(CASE WHEN store_id = 1 AND active = 1 THEN 1 ELSE 0 END) AS ativos_loja_1,
+	SUM(CASE WHEN store_id = 1 AND active = 0 THEN 1 ELSE 0 END) AS inativos_loja_1,
+	SUM(CASE WHEN store_id = 2 AND active = 1 THEN 1 ELSE 0 END) AS ativos_loja_2,
+	SUM(CASE WHEN store_id = 2 AND active = 0 THEN 1 ELSE 0 END) AS inativos_loja_2
+FROM sakila.customer;
+
+
+
+3. Utilizando os conceitos já estudados em módulos anteriores, qual outra estratégia poderia ser utilizada para atingir o mesmo resultado da pergunta acima? 
+Escreva a consulta SQL.
+SELECT DISTINCT store_id,
+	SUM(CASE WHEN active = 1 THEN 1 ELSE 0 END) AS clientes_ativos,
+	SUM(CASE WHEN active = 0 THEN 1 ELSE 0 END) AS clientes_inativos
+FROM sakila.customer
+    GROUP BY 1;
+
+
+
+4. Na tabela address, a coluna city_id representa a cidade na qual aquele endereço está situado. 
+Como você pode já ter percebido, ela faz referência à tabela city, que também contém uma coluna de mesmo nome. 
+Consultando manualmente o nome da cidade para os 5 primeiros registros da tabela address (registros com address_id entre 1 e 5), 
+escreva uma consulta SQL que retorne o endereço e o nome da cidade à qual ele se refere.
+Dica: use a sintaxe CASE WHEN, acompanhada da relação que você descobrir entre os valores de city_id nas duas tabelas.
+SELECT address AS endereco, CASE 
+	WHEN city_id = 1 THEN "A Corua (La Corua)"
+	WHEN city_id = 2 THEN "Abha"
+        WHEN city_id = 3 THEN "Abu Dhabi"
+        WHEN city_id = 4 THEN "Acua"
+        WHEN city_id = 5 THEN "Adana"
+	END AS cidade
+FROM sakila.address
+WHERE city_id BETWEEN "1" AND "5";
+
+

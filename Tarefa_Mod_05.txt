@@ -1,0 +1,68 @@
+1. Conte o número de registros nas tabelas seguintes. Além do número, escreva para cada item pelo menos 3 consultas com formas diferentes de chegar a esse resultado:
+
+a. customer = 599 registros.
+	Solução 1: rodar a consulta "SELECT * FROM sakila.customer;" e observar o Action Output quantas linhas foram retornadas.
+	Solução 2: rodar a consulta "SELECT COUNT(*) FROM sakila.customer;" e observar o resultado no Grid.
+	Solução 3: rodar a consulta "SELECT COUNT(1) FROM sakila.customer;" e observar o resultado no Grid.
+	Solução 4: rodar a consulta "SELECT COUNT(customer_id) FROM sakila.customer;" e observar o resultado no Grid.
+
+b. film = 1000 registros.
+	Solução 1: rodar a consulta "SELECT * FROM sakila.film;" e observar o Action Output quantas linhas foram retornadas.
+	Solução 2: rodar a consulta "SELECT COUNT(*) FROM sakila.film;" e observar o resultado no Grid.
+	Solução 3: rodar a consulta "SELECT COUNT(1) FROM sakila.film;" e observar o resultado no Grid.
+	Solução 4: rodar a consulta "SELECT COUNT(film_id) FROM sakila.film;" e observar o resultado no Grid.
+
+
+c. rental = 16044 registros.
+	Solução 1: rodar a consulta "SELECT * FROM sakila.rental;" e observar o Action Output quantas linhas foram retornadas.
+	Solução 2: rodar a consulta "SELECT COUNT(*) FROM sakila.rental;" e observar o resultado no Grid.
+	Solução 3: rodar a consulta "SELECT COUNT(1) FROM sakila.rental;" e observar o resultado no Grid.
+	Solução 4: rodar a consulta "SELECT COUNT(customer_id) FROM sakila.rental;" e observar o resultado no Grid.
+
+
+
+2. Qual foi o valor médio pago por aluguéis de filmes (tabela payment) no mês de junho de 2015? Quantos pagamentos foram realizados nesse período? Escreva a consulta utilizada!
+	a. '4.166038'
+		SELECT AVG(amount) FROM sakila.payment WHERE payment_date BETWEEN "2005-06-01" AND "2005-06-30";
+
+	b. 2312
+		SELECT COUNT(amount) FROM sakila.payment WHERE payment_date BETWEEN "2005-06-01" AND "2005-06-30";
+
+
+
+3. Em uma locadora, é comum haver um custo associado a cada filme para reposição, em caso de perda ou dano ao item. 
+	Qual é o maior custo de reposição (tabela film) no inventário atual? 
+	29,99
+
+	Descreva dois processos por meio dos quais você pode chegar a essa informação.
+	Solução 1: SELECT MAX(replacement_cost) FROM sakila.film;
+	Solução 2: rodar a consulta "SELECT * FROM sakila.film;", clicar duas vezes no nome da coluna "replacement_cost" para filtrar o valor em ordem decrescente e observar o resultado no Grid.
+	
+
+
+4. Escreva uma consulta que, a partir da tabela film, retorne resultado conforme o modelo disponibilizado.
+	SELECT DISTINCT rental_duration AS duracao_aluguel,
+			COUNT(*) AS total_filmes,
+			AVG(length) AS media_duracao_filme
+		FROM sakila.film
+	GROUP BY 1
+	ORDER BY 1 ASC;
+
+
+
+5. Responda: quantos e quais consumidores (representados pelo atributo customer_id) já tiveram um total de pagamentos (tabela payment) maior que 200? 
+	2 consumidores
+	148	216.54
+	526	221.55
+
+Escreva uma consulta SQL que retorne esse resultado.
+SELECT DISTINCT customer_id,
+			SUM(amount) AS total_de_pagamentos
+		FROM sakila.payment
+	GROUP BY 1
+HAVING total_de_pagamentos > 200
+	ORDER BY 1 ASC;
+
+
+
+

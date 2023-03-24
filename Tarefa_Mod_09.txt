@@ -1,0 +1,122 @@
+Conhecendo subconsultas, seu arsenal de ferramentas em SQL fica ainda mais completo. 
+Você agora pode juntar muitas camadas de processamento de dados em uma só consulta e reduzir o número de passos até respostas a perguntas mais complexas.
+Pratique os conhecimentos em subconsultas e responda às seguintes perguntas. 
+Submeta suas respostas em um arquivo com extensão .sql, e use comentários (com os caracteres -- ou /* */) para escrever suas respostas por extenso e delimitar as questões.
+
+
+1. Se você é do tempo da Blockbuster, deve lembrar que os filmes mais famosos ou mais novos eram oferecidos em maior quantidade para aluguel -- já que, 
+naturalmente, a demanda por eles era maior que a média. Vamos verificar essa premissa na nossa locadora usando o banco de dados sakila!
+
+a. Escreva uma consulta que liste, em ordem decrescente, os filmes mais alugados na nossa locadora. Utilize a tabela rental para isso, relacionando com a tabela inventory.
+
+SELECT i.film_id, f.title, COUNT(r.rental_id) as total_locacoes
+FROM rental AS r
+INNER JOIN inventory AS i
+ON r.inventory_id = i.inventory_id
+INNER JOIN film AS f
+ON i.film_id = f.film_id
+GROUP BY i.film_id
+ORDER BY total_locacoes DESC, film_id ASC;
+
+
+b. Escreva uma consulta que liste, em ordem decrescente, o número de unidades disponíveis de cada filme na locadora.
+	
+SELECT i.film_id, f.title, COUNT(i.inventory_id) as total_estoque
+FROM film AS f
+INNER JOIN inventory AS i
+ON i.film_id = f.film_id
+GROUP BY i.film_id
+ORDER BY total_estoque DESC, film_id ASC;
+
+
+
+c. Usando subconsultas, relacione as tabelas resultantes dos itens a) e b) e responda: 
+
+	os títulos mais alugados de fato correspondem aos que têm maior número de itens disponíveis? 
+		Sim.
+
+	Qual consulta você usou para chegar a esse resultado?
+	
+WITH locacoes AS(
+SELECT i.film_id, f.title, COUNT(r.rental_id) as total_locacoes
+FROM rental AS r
+INNER JOIN inventory AS i
+ON r.inventory_id = i.inventory_id
+INNER JOIN film AS f
+ON i.film_id = f.film_id
+GROUP BY i.film_id
+ORDER BY total_locacoes DESC, film_id ASC),
+
+estoque AS(
+SELECT i.film_id, f.title, COUNT(i.inventory_id) as total_estoque
+FROM film AS f
+INNER JOIN inventory AS i
+ON i.film_id = f.film_id
+GROUP BY i.film_id
+ORDER BY total_estoque DESC, film_id ASC)
+
+SELECT l.*, e.total_estoque
+FROM locacoes AS l
+INNER JOIN estoque AS e
+ON l.film_id = e.film_id
+GROUP BY l.film_id
+ORDER BY total_locacoes DESC;
+
+
+	Bônus: caso queira, use métricas de descrição estatística (média, percentil) para responder à pergunta de forma mais embasada.
+	Dashboard salvo em https://lookerstudio.google.com/reporting/fba73ac9-a19b-481f-a3f6-343e3d591996
+
+
+
+
+
+2. A view chamada sales_by_film_category traz o resultado total de vendas em aluguéis por categoria dos filmes. 
+Escreva uma consulta que complemente essa tabela com as seguintes métricas para cada categoria:
+Valor médio do aluguel dos filmes por categoria;
+• Valor médio do custo de reposição dos filmes por categoria;
+• Total de vendas por categoria na loja 1; Total de vendas por categoria na loja 2; (dica: use o comando CASE WHEN)
+• Total de títulos disponíveis por categoria (dica: use a tabela inventory)
+
+
+SELECT fc.category_id, 
+		c.name, 
+        SUM(p.amount) AS valor_total_alugueis, 
+        AVG(p.amount) AS valor_medio_alugueis, 
+        AVG(f.replacement_cost) AS valor_medio_custo_reposicao,
+        SUM(CASE WHEN i.store_id = 1 THEN p.amount ELSE 0 END) AS valor_total_alugueis_loja_1, 
+		SUM(CASE WHEN i.store_id = 2 THEN p.amount ELSE 0 END) AS valor_total_alugueis_loja_2,
+        COUNT(i.inventory_id) AS total_titulos
+FROM category AS c
+INNER JOIN film_category AS fc
+ON c.category_id = fc.category_id
+INNER JOIN inventory AS i
+ON fc.film_id = i.film_id
+INNER JOIN film AS f
+ON f.film_id = i.film_id
+INNER JOIN rental AS r
+ON i.inventory_id = r.inventory_id
+INNER JOIN payment AS p
+ON r.rental_id = p.rental_id
+GROUP BY fc.category_id;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
