@@ -1,0 +1,165 @@
+
+/* 
+1. Conhecendo funções de datas, você pode agora conhecer mais sobre algumas métricas de performance de vendas das lojas. Escreva consultas que retornem:
+
+a. A quantidade de aluguéis por mês por loja. 
+*/
+
+SELECT  staff_id AS Loja,
+    	DATE_FORMAT(rental_date, "%Y-%m") AS Mes,
+	COUNT(rental_id) AS Total_alugueis,
+    	SUM(COUNT(rental_id)) OVER (PARTITION BY staff_id ORDER BY (DATE_FORMAT(rental_date, "%Y-%m"))) AS Total_acumulado_loja
+FROM rental
+GROUP BY Loja, Mes
+ORDER BY Loja, Mes;
+
+
+
+/*
+b. O valor total pago por mês em toda a rede.
+*/
+
+SELECT  DATE_FORMAT(payment_date, "%Y-%m") AS Mes,
+	SUM(amount) AS Total,
+    	SUM(SUM(amount)) OVER (ORDER BY (DATE_FORMAT(payment_date, "%Y-%m"))) AS Total_acumulado
+FROM payment
+GROUP BY Mes
+ORDER BY Mes;
+
+
+
+
+/*
+c. A quantidade de aluguéis por semana entre maio e junho de 2005. Qual semana teve a melhor performance?
+
+A semana 24, que iniciou no dia 12/06/05, teve a melhor performance.
+
+Semana	primeiro_dia_semana	Total_alugueis
+24	2005-06-12		1357
+25	2005-06-19		954
+21	2005-05-22		681
+22	2005-05-29		475
+*/
+
+WITH tabela_classificada AS
+			(SELECT  *, 
+			EXTRACT(WEEK FROM (SELECT DATE_FORMAT(rental_date, '%Y-%m-%d'))) AS Semana,
+        		DATE_SUB(DATE_FORMAT(rental_date, '%Y-%m-%d'), INTERVAL DAYOFWEEK(DATE_FORMAT(rental_date, '%Y-%m-%d')) - 1 DAY) AS primeiro_dia_semana
+	FROM rental
+	WHERE rental_date BETWEEN "2005-05-01" AND "2005-06-30")
+
+SELECT  Semana,
+	primeiro_dia_semana,
+	COUNT(rental_id) AS Total_alugueis
+FROM tabela_classificada
+GROUP BY Semana, primeiro_dia_semana
+ORDER BY Total_alugueis DESC;
+
+
+
+
+
+/*
+2. A gerência da rede deseja entender se no mês de maio de 2005 houve diferença na recorrência dos consumidores fidelizados 
+(ou seja, que realizaram mais de um aluguel) entre as duas lojas. 
+Seu desafio é escrever uma consulta que retorne o número médio de dias entre os aluguéis desses consumidores, por loja que estão registrados. 
+
+Dicas de como construir essa consulta:
+
+Descubra, primeiro, quem são os consumidores (pelo seu customer_id) que queremos analisar: realizaram dois ou mais aluguéis no mês de maio de 2005.
+
+- Depois, avalie a diferença de tempo entre cada aluguel e o seguinte, por consumidor. 
+Você precisará de uma função de janela para isso. 
+
+- Por fim, calcule a média de tempo entre aluguéis para cada uma das lojas. Lembre-se que a tabela customer indica qual loja cada pessoa se cadastrou.
+
+Com isso, responda: há diferença no número médio de dias entre aluguéis desse segmento de consumidores para as duas lojas?
+
+
+Sim, a média da loja 1 foi um pouco maior.
+
+Loja	Média de Dias
+1	0.9766
+2	0.9112
+*/
+
+
+WITH alugueis_maio AS (
+	SELECT *
+	FROM rental
+	WHERE rental_date BETWEEN "2005-05-01" AND "2005-05-31"
+	ORDER BY customer_id),
+
+contagem_alugueis AS (
+	SELECT customer_id,
+	COUNT(rental_id) AS total_alugueis
+    	FROM alugueis_maio
+    	GROUP BY customer_id
+    	HAVING total_alugueis > 1
+    	ORDER BY customer_id),
+    
+tabela_classificada AS(
+	SELECT  c.customer_id,
+		a.rental_id,
+		DATE_FORMAT(a.rental_date, '%Y-%m-%d') AS data_aluguel,
+		a.inventory_id,
+		a.staff_id
+	FROM contagem_alugueis AS c
+	INNER JOIN alugueis_maio AS a
+	ON c.customer_id = a.customer_id
+	ORDER BY c.customer_id, data_aluguel),
+
+tabela_final AS (SELECT  *,
+			CASE WHEN LEAD(data_aluguel) OVER(PARTITION BY customer_id) IS NULL THEN data_aluguel
+				ELSE LEAD(data_aluguel) OVER(PARTITION BY customer_id)
+				END AS data_aluguel_anterior
+	FROM tabela_classificada),
+
+
+resultado AS (SELECT  *,
+		DATEDIFF(data_aluguel_anterior, data_aluguel) AS dif_data
+	FROM tabela_final
+	ORDER BY customer_id, staff_id)
+
+SELECT  staff_id,
+	AVG(dif_data)
+FROM resultado
+GROUP BY staff_id
+ORDER BY staff_id;
+
+
+
+
+
+/*
+3. Reescreva a consulta da tarefa do Módulo 3, dessa vez utilizando um filtro com expressões regulares: 
+quais filmes disponíveis na locadora têm indicação de orientação parental (PG ou PG-13)?
+
+Solução 1: 
+*/
+SELECT * 
+FROM film 
+WHERE REGEXP_LIKE(rating, "PG");
+
+
+/*
+Solução 2:
+*/
+SELECT * 
+FROM film 
+WHERE rating LIKE "%PG%";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
