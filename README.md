@@ -16,7 +16,7 @@
 - [x] Módulo 8: Relacionamentos Avançados
 - [x] Módulo 9: Subconsultas e tabelas temporárias
 - [x] Módulo 10: Funções de Janela
-- [ ] Módulo 11: Funções Avançadas: Datas e Strings
+- [x] Módulo 11: Funções Avançadas: Datas e Strings
 - [ ] Módulo 12: Linguagem de definição de dados
 - [ ] Módulo 13: Linguagem de manipulação de dados
 - [ ] Módulo 14: Desempenho do OBD e design do sistema
