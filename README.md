@@ -18,7 +18,7 @@
 - [x] Módulo 10: Funções de Janela
 - [x] Módulo 11: Funções Avançadas: Datas e Strings
 - [x] Módulo 12: Linguagem de definição de dados
-- [ ] Módulo 13: Linguagem de manipulação de dados
+- [x] Módulo 13: Linguagem de manipulação de dados
 - [ ] Módulo 14: Desempenho do OBD e design do sistema
 - [ ] Módulo 15: Controle de nível de acesso
 - [ ] Módulo 16: Softwares de banco de dados
