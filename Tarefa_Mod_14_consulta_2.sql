@@ -1,0 +1,1 @@
+CALL bd_pigma.alto_risco_incendio();
