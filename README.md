@@ -19,9 +19,9 @@
 - [x] Módulo 11: Funções Avançadas: Datas e Strings
 - [x] Módulo 12: Linguagem de definição de dados
 - [x] Módulo 13: Linguagem de manipulação de dados
-- [ ] Módulo 14: Desempenho do OBD e design do sistema
-- [ ] Módulo 15: Controle de nível de acesso
-- [ ] Módulo 16: Softwares de banco de dados
+- [x] Módulo 14: Desempenho do OBD e design do sistema
+- [x] Módulo 15: Controle de nível de acesso
+- [x] Módulo 16: Softwares de banco de dados
 - [ ] Módulo 17: Projeto Final
 
 
