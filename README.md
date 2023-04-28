@@ -22,7 +22,7 @@
 - [x] Módulo 14: Desempenho do OBD e design do sistema
 - [x] Módulo 15: Controle de nível de acesso
 - [x] Módulo 16: Softwares de banco de dados
-- [ ] Módulo 17: Projeto Final
+- [x] Módulo 17: Projeto Final
 
 
   </p>
